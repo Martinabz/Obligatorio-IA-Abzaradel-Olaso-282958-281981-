@@ -92,7 +92,7 @@ class QLearningAgent:
             total_reward = 0
             steps = 0
             
-            while not done and steps < 1000:
+            while not done : # and steps < 4000:
                 steps += 1
                 # Usar política óptima (sin exploración)
                 action = self.next_action(state, epsilon=0.0, training=False)
