@@ -27,7 +27,8 @@ class DynaQAgent:
         
         self.training_history = {
             'rewards': [],
-            'steps': []
+            'steps': [],
+            'successes': []
         }
     
     def discretize_state(self, obs):
@@ -107,12 +108,15 @@ class DynaQAgent:
                 state = next_state
                 total_reward += reward
             
+            success = int(done and steps < max_steps)
             self.training_history['rewards'].append(total_reward)
             self.training_history['steps'].append(steps)
+            self.training_history['successes'].append(success)
             
             if (episode + 1) % max(1, episodes // 10) == 0:
                 avg_reward = np.mean(self.training_history['rewards'][-max(1, episodes // 10):])
-                print(f"Episode {episode + 1}/{episodes} - Avg Reward: {avg_reward:.2f}, Steps: {steps}")
+                avg_success = np.mean(self.training_history['successes'][-max(1, episodes // 10):]) * 100
+                print(f"Episode {episode + 1}/{episodes} - Avg Reward: {avg_reward:.2f}, Steps: {steps}, Success: {avg_success:.1f}%")
 
     def test_agent(self, env, episodes=10, render=False):
         test_rewards = []
@@ -135,11 +139,13 @@ class DynaQAgent:
                 if render:
                     env.render()
             
+            success = int(done and steps < 4000)
             test_rewards.append(total_reward)
             test_steps.append(steps)
-            print(f"Test Episode {episode + 1} - Reward: {total_reward:.2f}, Steps: {steps}")
+            success_count += success
+            print(f"Test Episode {episode + 1} - Reward: {total_reward:.2f}, Steps: {steps}, Success: {success}")
         
-        return test_rewards, test_steps
+        return test_rewards, test_steps, success_count
     
     def plot_training_history(self):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
