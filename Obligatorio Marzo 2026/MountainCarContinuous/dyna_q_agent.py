@@ -121,6 +121,7 @@ class DynaQAgent:
     def test_agent(self, env, episodes=10, render=False):
         test_rewards = []
         test_steps = []
+        success_count = 0
         
         for episode in range(episodes):
             obs, _ = env.reset()
@@ -170,6 +171,26 @@ class DynaQAgent:
         print(f"Modelo guardado en {filename}")
     
     def load_model(self, filename='dyna_agent_model.npy'):
-        self.Q = np.load(filename)
-        print(f"Modelo cargado desde {filename}")
+        loaded = np.load(filename)
+        # Assign loaded Q-table
+        self.Q = loaded
+
+        # If loaded Q shape differs from current discretization, adapt bins and actions
+        try:
+            x_size, vel_size, action_size = self.Q.shape
+            # x_size should be x_bins + 1
+            if x_size != (self.x_bins + 1):
+                self.x_bins = x_size - 1
+                self.x_space = np.linspace(-1.2, 0.6, self.x_bins)
+            if vel_size != (self.vel_bins + 1):
+                self.vel_bins = vel_size - 1
+                self.vel_space = np.linspace(-0.07, 0.07, self.vel_bins)
+            if action_size != self.action_bins:
+                self.action_bins = action_size
+                self.actions = list(np.linspace(-1, 1, self.action_bins))
+        except Exception:
+            # If not a 3D array, just keep the loaded object and warn
+            pass
+
+        print(f"Modelo cargado desde {filename} (Q shape: {self.Q.shape})")
 
