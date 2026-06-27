@@ -22,7 +22,8 @@ class ExpectimaxAgent(Agent):
         return my_moves - enemy_moves
 
     def expectimax(self, board: Board, player: int, depth: int):
-        return self.max_value(board, player, depth)
+        value, action = self.max_value(board, player, depth)
+        return action, value
 
     def max_value(self, board: Board, player: int, depth: int):
         terminal, winner = board.is_end(player)
