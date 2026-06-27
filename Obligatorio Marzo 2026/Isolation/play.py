@@ -15,3 +15,4 @@ def play_vs_other_agent(env, agent1, agent2, render = False):
     if render: env.render()
     final_msg = "Player " + str(winner) + " WON"
     print(final_msg)
+    return winner
