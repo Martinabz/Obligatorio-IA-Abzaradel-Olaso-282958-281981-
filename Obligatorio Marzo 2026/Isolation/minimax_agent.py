@@ -37,10 +37,6 @@ class MinimaxAgent(Agent):
         if not actions:
             return self._terminal_utility(3 - player), None
 
-        actions = board.get_possible_actions(player)
-        if not actions:
-            return self._terminal_utility(3 - player), None
-
         value = -inf
         best_action = None
         for action in actions:
@@ -62,10 +58,6 @@ class MinimaxAgent(Agent):
             return self._terminal_utility(winner), None
         if depth == 0:
             return self.heuristic_utility(board), None
-
-        actions = board.get_possible_actions(player)
-        if not actions:
-            return self._terminal_utility(3 - player), None
 
         actions = board.get_possible_actions(player)
         if not actions:

@@ -40,6 +40,7 @@ class ExpectimaxAgent(Agent):
         best_action = None
         for action in actions:
             next_board = board.clone()
+            next_board.play(action, player)
             next_value, _ = self.exp_value(next_board, 3 - player, depth - 1)
             if best_action is None or next_value > value:
                 value = next_value
@@ -62,6 +63,7 @@ class ExpectimaxAgent(Agent):
         count = 0
         for action in actions:
             next_board = board.clone()
+            next_board.play(action, player)
             next_value, _ = self.max_value(next_board, 3 - player, depth - 1)
             total += next_value
             count += 1
