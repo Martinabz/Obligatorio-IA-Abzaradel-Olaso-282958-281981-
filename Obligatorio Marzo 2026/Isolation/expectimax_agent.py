@@ -5,7 +5,7 @@ from board import Board
 
 
 class ExpectimaxAgent(Agent):
-    def __init__(self, player=1, max_depth=3):
+    def __init__(self, player=1, max_depth=2):
         super().__init__(player)
         self.max_depth = max_depth
 
