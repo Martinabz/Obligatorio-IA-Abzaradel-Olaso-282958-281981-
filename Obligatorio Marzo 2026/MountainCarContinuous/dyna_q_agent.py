@@ -72,7 +72,7 @@ class DynaQAgent:
                 obs, reward, done, _, _ = env.step(np.array([action]))
                 next_state = self.discretize_state(obs)
                 
-                # Q-Learning update (experiencia real)
+                # Q-Learning update
                 next_action_idx = np.argmax(self.Q[next_state])
                 self.Q[state][action_idx] = self.Q[state][action_idx] + alpha * (
                     reward + gamma * self.Q[next_state][next_action_idx] - self.Q[state][action_idx]
@@ -172,10 +172,8 @@ class DynaQAgent:
     
     def load_model(self, filename='dyna_agent_model.npy'):
         loaded = np.load(filename)
-        # Assign loaded Q-table
         self.Q = loaded
 
-        # If loaded Q shape differs from current discretization, adapt bins and actions
         try:
             x_size, vel_size, action_size = self.Q.shape
             # x_size should be x_bins + 1
@@ -189,7 +187,6 @@ class DynaQAgent:
                 self.action_bins = action_size
                 self.actions = list(np.linspace(-1, 1, self.action_bins))
         except Exception:
-            # If not a 3D array, just keep the loaded object and warn
             pass
 
         print(f"Modelo cargado desde {filename} (Q shape: {self.Q.shape})")

@@ -113,10 +113,6 @@ class HyperparameterEvaluator:
 
         return table
 
-    # ------------------------------------------------------------------
-    # MÉTRICAS DE ENTRENAMIENTO (del history del manager)
-    # ------------------------------------------------------------------
-
     def convergence_episode(self, run_id, threshold=0, window=50):
         """
         Devuelve el episodio en que la reward media (ventana móvil) superó
@@ -136,10 +132,6 @@ class HyperparameterEvaluator:
         rewards = self.manager.history[run_id]['rewards']
         tail = rewards[-last_n:] if len(rewards) >= last_n else rewards
         return float(np.std(tail))
-
-    # ------------------------------------------------------------------
-    # GRÁFICOS
-    # ------------------------------------------------------------------
 
     def plot_ranking(self, metric='avg_reward', top_n=10, run_ids=None):
         """Bar chart horizontal con los mejores runs."""
@@ -288,9 +280,6 @@ class HyperparameterEvaluator:
         plt.tight_layout()
         plt.show()
 
-    # ------------------------------------------------------------------
-    # JUSTIFICACIÓN / REPORTE
-    # ------------------------------------------------------------------
 
     def print_best(self, metric='avg_reward', run_ids=None):
         """Imprime el mejor run con todos sus parámetros y métricas."""
@@ -347,9 +336,6 @@ class HyperparameterEvaluator:
         print()
         self.print_best(run_ids=run_ids)
 
-    # ------------------------------------------------------------------
-    # MERGE
-    # ------------------------------------------------------------------
 
     def merge(self, other):
         """
