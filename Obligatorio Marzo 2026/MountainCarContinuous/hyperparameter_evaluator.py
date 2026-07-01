@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 class _MergedManager:
-    """Manager virtual que fusiona los historiales de dos o más managers para uso interno."""
+    """Manager virtual que fusiona los historiales de los managers de DynaQ y Q-learning."""
     def __init__(self, *managers):
         self.history = {}
         for m in managers:
@@ -13,21 +13,18 @@ class _MergedManager:
 class HyperparameterEvaluator:
     """
     Evalúa y compara experimentos ya entrenados almacenados en un ExperimentManager
-    o DynaQExperimentManager. No entrena: solo analiza el historial y corre tests.
+    o DynaQExperimentManager.
     """
 
     def __init__(self, manager):
         self.manager = manager
         self.eval_results = {}
 
-    # ------------------------------------------------------------------
-    # EVALUACIÓN
-    # ------------------------------------------------------------------
 
     def evaluate(self, env, run_ids=None, episodes=10, max_steps=4000):
         """
         Corre episodios de test (epsilon=0) para cada run_id y guarda métricas.
-        Si run_ids es None evalúa todos los experimentos del manager.
+        Sin id evalua todos los experimentos del manager.
         """
         targets = run_ids if run_ids is not None else list(self.manager.history.keys())
 
@@ -79,12 +76,8 @@ class HyperparameterEvaluator:
 
         print("=== Evaluación completada ===\n")
 
-    # ------------------------------------------------------------------
-    # TABLA RESUMEN
-    # ------------------------------------------------------------------
-
     def _filter(self, run_ids=None):
-        """Devuelve subconjunto de eval_results filtrado por run_ids (o todos si None)."""
+        """Devuelve subconjunto de eval_results filtrado por run_ids o todos si no se especifican."""
         if run_ids is None:
             return dict(self.eval_results)
         return {rid: self.eval_results[rid] for rid in run_ids if rid in self.eval_results}
@@ -134,7 +127,7 @@ class HyperparameterEvaluator:
         return float(np.std(tail))
 
     def plot_ranking(self, metric='avg_reward', top_n=10, run_ids=None):
-        """Bar chart horizontal con los mejores runs."""
+        """Bar chart horizontal con las mejores corridas."""
         subset = self._filter(run_ids)
         if not subset:
             print("Ejecutá evaluate() primero.")
