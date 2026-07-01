@@ -2,6 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class _MergedManager:
+    """Manager virtual que fusiona los historiales de dos o más managers para uso interno."""
+    def __init__(self, *managers):
+        self.history = {}
+        for m in managers:
+            self.history.update(m.history)
+
+
 class HyperparameterEvaluator:
     """
     Evalúa y compara experimentos ya entrenados almacenados en un ExperimentManager
@@ -338,3 +346,17 @@ class HyperparameterEvaluator:
 
         print()
         self.print_best(run_ids=run_ids)
+
+    # ------------------------------------------------------------------
+    # MERGE
+    # ------------------------------------------------------------------
+
+    def merge(self, other):
+        """
+        Devuelve un nuevo HyperparameterEvaluator que combina los eval_results
+        y el manager.history de este evaluador con los de `other`.
+        Los originales no se modifican.
+        """
+        combined = HyperparameterEvaluator(_MergedManager(self.manager, other.manager))
+        combined.eval_results = {**self.eval_results, **other.eval_results}
+        return combined
