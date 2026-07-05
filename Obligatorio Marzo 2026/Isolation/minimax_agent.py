@@ -1,13 +1,15 @@
 from math import inf
+import numpy as np
 
 from agent import Agent
 from board import Board
 
 
 class MinimaxAgent(Agent):
-    def __init__(self, player=1, max_depth=3):
+    def __init__(self, player=1, max_depth=3, heuristic="baseline"):
         super().__init__(player)
         self.max_depth = max_depth
+        self.heuristic = heuristic
 
     def next_action(self, obs):
         action, _ = self.alpha_beta_prune(obs, self.player, self.max_depth)
@@ -16,7 +18,37 @@ class MinimaxAgent(Agent):
     def heuristic_utility(self, board: Board):
         my_moves = len(board.get_possible_actions(self.player))
         enemy_moves = len(board.get_possible_actions(3 - self.player))
-        return my_moves - enemy_moves
+        eliminated = np.count_nonzero(board.grid == 3) #3 es como estan representadas las celdas eliminadas del tablero
+        total_cells = board.board_size[0] * board.board_size[1] -2
+        ratio = eliminated / total_cells
+
+
+        if self.heuristic == "baseline":
+            return my_moves - enemy_moves
+
+        elif self.heuristic == "offensive":
+            return my_moves - 2 * enemy_moves
+
+        elif self.heuristic == "defensive":
+            return 2 * my_moves - enemy_moves
+
+        elif self.heuristic == "simple":
+            return my_moves
+
+        elif self.heuristic == "d2o": #defensive to offensive
+            if ratio < 0.5:
+                return 2 * my_moves - enemy_moves
+            else:
+                return my_moves - 2 * enemy_moves
+
+        elif self.heuristic == "o2d": #offensive to defensive
+            if ratio < 0.5:
+                return my_moves - 2 * enemy_moves
+            else:
+                return 2 * my_moves - enemy_moves
+
+        else:
+            raise ValueError(f"Heurística desconocida: {self.heuristic}")
 
     def alpha_beta_prune(self, board: Board, player: int, depth: int):
         value, action = self.max_value(board, player, -inf, inf, depth)
