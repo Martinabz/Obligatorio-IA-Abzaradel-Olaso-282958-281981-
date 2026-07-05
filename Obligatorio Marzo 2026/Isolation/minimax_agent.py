@@ -6,7 +6,7 @@ from board import Board
 
 
 class MinimaxAgent(Agent):
-    def __init__(self, player=1, max_depth=3, heuristic="baseline"):
+    def __init__(self, player=1, max_depth=3, heuristic="defensive"):
         super().__init__(player)
         self.max_depth = max_depth
         self.heuristic = heuristic
