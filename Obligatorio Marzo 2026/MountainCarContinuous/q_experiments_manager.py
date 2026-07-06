@@ -137,14 +137,12 @@ class ExperimentManager:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
         fig.suptitle(f"Progreso del experimento: {run_id}", fontsize=12)
         
-        # Gráfica de Recompensas
         ax1.plot(data['rewards'], color='steelblue', alpha=0.8)
         ax1.set_xlabel('Episode')
         ax1.set_ylabel('Total Reward')
         ax1.set_title('Reward per Episode')
         ax1.grid(True)
         
-        # Gráfica de Pasos
         ax2.plot(data['steps'], color='coral', alpha=0.8)
         ax2.set_xlabel('Episode')
         ax2.set_ylabel('Steps')

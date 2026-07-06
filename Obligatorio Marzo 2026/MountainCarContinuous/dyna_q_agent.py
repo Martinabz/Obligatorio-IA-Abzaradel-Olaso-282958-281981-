@@ -10,18 +10,14 @@ class DynaQAgent:
         self.vel_bins = vel_bins
         self.action_bins = action_bins
         
-        # Espacios discretizados
         self.x_space = np.linspace(-1.2, 0.6, x_bins)
         self.vel_space = np.linspace(-0.07, 0.07, vel_bins)
         self.actions = list(np.linspace(-1, 1, action_bins))
-        
-        # Tabla Q
+
         self.Q = np.zeros((x_bins + 1, vel_bins + 1, action_bins))
         
-        # Modelo del entorno: Model[state][action] = (reward, next_state)
         self.Model = defaultdict(dict)
         
-        # Estados y acciones observadas
         self.observed_states = set()
         self.observed_actions = defaultdict(set)
         
@@ -58,21 +54,16 @@ class DynaQAgent:
             total_reward = 0
             steps = 0
             
-            # Epsilon decay lineal
+            # Epsilon decay
             epsilon = epsilon_start + (epsilon_end - epsilon_start) * (episode / max(1, episodes - 1))
             
             while not done and steps < max_steps:
                 steps += 1
-                
-                # Seleccionar acción
                 action = self.next_action(state, epsilon=epsilon, training=True)
-                action_idx = self.get_action_index(action)
-                
-                # Ejecutar acción en el entorno real
+                action_idx = self.get_action_index(action)                
                 obs, reward, done, _, _ = env.step(np.array([action]))
                 next_state = self.discretize_state(obs)
                 
-                # Q-Learning update (experiencia real)
                 next_action_idx = np.argmax(self.Q[next_state])
                 self.Q[state][action_idx] = self.Q[state][action_idx] + alpha * (
                     reward + gamma * self.Q[next_state][next_action_idx] - self.Q[state][action_idx]
@@ -88,10 +79,8 @@ class DynaQAgent:
                 # Fase de planificación: simulación con el modelo
                 for _ in range(planning_steps):
                     if len(self.observed_states) > 0:
-                        # Seleccionar estado aleatorio observado
                         state_sim = random.choice(list(self.observed_states))
                         
-                        # Seleccionar acción aleatoria en ese estado
                         if state_sim in self.observed_actions and len(self.observed_actions[state_sim]) > 0:
                             action_idx_sim = random.choice(list(self.observed_actions[state_sim]))
                             
@@ -172,7 +161,6 @@ class DynaQAgent:
     
     def load_model(self, filename='dyna_agent_model.npy'):
         loaded = np.load(filename)
-        # Assign loaded Q-table
         self.Q = loaded
 
         # If loaded Q shape differs from current discretization, adapt bins and actions
@@ -189,7 +177,6 @@ class DynaQAgent:
                 self.action_bins = action_size
                 self.actions = list(np.linspace(-1, 1, self.action_bins))
         except Exception:
-            # If not a 3D array, just keep the loaded object and warn
             pass
 
         print(f"Modelo cargado desde {filename} (Q shape: {self.Q.shape})")

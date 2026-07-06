@@ -8,13 +8,11 @@ class QLearningAgent:
         self.x_bins = x_bins
         self.vel_bins = vel_bins
         self.action_bins = action_bins
-        
-        # Espacios discretizados
+
         self.x_space = np.linspace(-1.2, 0.6, x_bins)
         self.vel_space = np.linspace(-0.07, 0.07, vel_bins)
         self.actions = list(np.linspace(-1, 1, action_bins))
-        
-        # Tabla Q
+
         self.Q = np.zeros((x_bins + 1, vel_bins + 1, action_bins))
         
         self.training_history = {
@@ -33,10 +31,8 @@ class QLearningAgent:
     
     def next_action(self, state, epsilon=0.1, training=True):
         if training and np.random.random() < epsilon:
-            # Exploración: acción aleatoria
             action = random.choice(self.actions)
         else:
-            # Explotación: acción óptima
             action_idx = np.argmax(self.Q[state])
             action = self.actions[action_idx]
         
@@ -56,21 +52,16 @@ class QLearningAgent:
             
             while not done and steps < max_steps:
                 steps += 1
-                
-                # Seleccionar acción
                 action = self.next_action(state, epsilon=epsilon, training=True)
                 action_idx = self.get_action_index(action)
-                
-                # Ejecutar acción
                 obs, reward, done, _, _ = env.step(np.array([action]))
                 next_state = self.discretize_state(obs)
                 
-                # Q-Learning update
                 next_action_idx = np.argmax(self.Q[next_state])
                 self.Q[state][action_idx] = self.Q[state][action_idx] + alpha * (
                     reward + gamma * self.Q[next_state][next_action_idx] - self.Q[state][action_idx]
                 )
-                
+
                 state = next_state
                 total_reward += reward
             
